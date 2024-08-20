@@ -4,12 +4,10 @@ from typing import Tuple, Optional
 import cv2
 import gradio as gr
 import numpy as np
-import spaces
 import supervision as sv
 import torch
 from PIL import Image
 from tqdm import tqdm
-from utils.video import generate_unique_name, create_directory, delete_directory
 
 from utils.florence import load_florence_model, run_florence_inference, \
     FLORENCE_DETAILED_CAPTION_TASK, \
@@ -99,7 +97,6 @@ def on_mode_dropdown_change(text):
     ]
 
 
-@spaces.GPU
 @torch.inference_mode()
 @torch.autocast(device_type="cuda", dtype=torch.bfloat16)
 def process_image(
