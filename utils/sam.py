@@ -4,7 +4,7 @@ import numpy as np
 import supervision as sv
 import torch
 from PIL import Image
-from sam2.build_sam import build_sam2, build_sam2_video_predictor
+from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 
 SAM_CHECKPOINT = "checkpoints/sam2_hiera_small.pt"

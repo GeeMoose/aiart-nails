@@ -6,3 +6,4 @@ samv2
 supervision
 opencv-python-headless
 gradio
+pytest
