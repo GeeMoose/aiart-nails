@@ -49,8 +49,8 @@ MASK_ANNOTATOR = sv.MaskAnnotator(
 def annotate_image(image, detections):
     output_image = image.copy()
     output_image = MASK_ANNOTATOR.annotate(output_image, detections)
-    output_image = BOX_ANNOTATOR.annotate(output_image, detections)
-    output_image = LABEL_ANNOTATOR.annotate(output_image, detections)
+    # output_image = BOX_ANNOTATOR.annotate(output_image, detections)
+    # output_image = LABEL_ANNOTATOR.annotate(output_image, detections)
     return output_image
 
 
@@ -58,18 +58,19 @@ def annotate_image(image, detections):
 @torch.inference_mode()
 @torch.autocast(device_type="cuda", dtype=torch.bfloat16)
 def process_image(
-    image_input, text_input
+    image_input, text_input = "the nails"
 ) -> Tuple[Optional[Image.Image], Optional[str]]:
     if not image_input:
         gr.Info("Please upload an image.")
         return None, None
 
     
-    if not text_input:
-        gr.Info("Please enter a text prompt.")
-        return None, None
+    # if not text_input:
+    #     gr.Info("Please enter a text prompt.")
+    #     return None, None
 
-    texts = [prompt.strip() for prompt in text_input.split(",")]
+    # texts = [prompt.strip() for prompt in text_input.split(",")]
+    texts = [text_input]
     detections_list = []
     for text in texts:
         _, result = run_florence_inference(
@@ -205,9 +206,6 @@ with gr.Blocks() as demo:
             with gr.Column():
                 image_processing_image_input_component = gr.Image(
                     type='pil', label='Upload image')
-                image_processing_text_input_component = gr.Textbox(
-                    label='Text prompt',
-                    placeholder='Enter comma separated text prompts')
                 image_processing_submit_button_component = gr.Button(
                     value='Submit', variant='primary')
             with gr.Column():
@@ -251,19 +249,7 @@ with gr.Blocks() as demo:
     image_processing_submit_button_component.click(
         fn=process_image,
         inputs=[
-            image_processing_image_input_component,
-            image_processing_text_input_component
-        ],
-        outputs=[
-            image_processing_image_output_component,
-            image_processing_text_output_component
-        ]
-    )
-    image_processing_text_input_component.submit(
-        fn=process_image,
-        inputs=[
-            image_processing_image_input_component,
-            image_processing_text_input_component
+            image_processing_image_input_component
         ],
         outputs=[
             image_processing_image_output_component,
