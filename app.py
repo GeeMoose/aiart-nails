@@ -48,10 +48,12 @@ MASK_ANNOTATOR = sv.MaskAnnotator(
 
 def annotate_image(image, detections):
     output_image = image.copy()
+    mask_image = np.zeros_like(output_image)
+    for mask in detections.mask:
+        mask_image[mask] = 255
+    # mask_image = MASK_ANNOTATOR_0.annotate(output_image, detections)
     output_image = MASK_ANNOTATOR.annotate(output_image, detections)
-    # output_image = BOX_ANNOTATOR.annotate(output_image, detections)
-    # output_image = LABEL_ANNOTATOR.annotate(output_image, detections)
-    return output_image
+    return output_image, Image.fromarray(mask_image)
 
 
 
@@ -91,7 +93,7 @@ def process_image(
 
     detections = sv.Detections.merge(detections_list)
     detections = run_sam_inference(SAM_IMAGE_MODEL, image_input, detections)
-    return annotate_image(image_input, detections), None
+    return annotate_image(image_input, detections)
 
 # @torch.inference_mode()
 # @torch.autocast(device_type="cuda", dtype=torch.bfloat16)
@@ -211,8 +213,10 @@ with gr.Blocks() as demo:
             with gr.Column():
                 image_processing_image_output_component = gr.Image(
                     type='pil', label='Image output')
-                image_processing_text_output_component = gr.Textbox(
-                    label='Caption output', visible=False)
+                image_processing_mask_output_component = gr.Image(
+                    type='pil', label='Mask output')
+                # image_processing_text_output_component = gr.Textbox(
+                #     label='Caption output', visible=False)
                 
     # with gr.Tab("Video"):
     #     video_processing_mode_dropdown_component = gr.Dropdown(
@@ -253,7 +257,8 @@ with gr.Blocks() as demo:
         ],
         outputs=[
             image_processing_image_output_component,
-            image_processing_text_output_component
+            image_processing_mask_output_component,
+            # image_processing_text_output_component
         ]
     )
 
