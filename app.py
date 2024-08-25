@@ -48,12 +48,17 @@ MASK_ANNOTATOR = sv.MaskAnnotator(
 
 def annotate_image(image, detections):
     output_image = image.copy()
-    mask_image = np.zeros_like(output_image)
+    mask_image = np.zeros((image.height, image.width), dtype=np.uint8)
     for mask in detections.mask:
         mask_image[mask] = 255
     # mask_image = MASK_ANNOTATOR_0.annotate(output_image, detections)
-    output_image = MASK_ANNOTATOR.annotate(output_image, detections)
-    return output_image, Image.fromarray(mask_image)
+    # output_image = MASK_ANNOTATOR.annotate(output_image, detections)
+
+    # 新增：创建目标的透明图
+    obj_image = Image.new("RGBA", output_image.size)
+    obj_image.paste(output_image, (0, 0), Image.fromarray(mask_image))  # 使用遮罩图作为透明度
+
+    return obj_image, Image.fromarray(mask_image)
 
 
 
