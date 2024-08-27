@@ -60,15 +60,14 @@ def process_with_flux(
     seed_slicer: int,
     randomize_seed_checkbox: bool,
     strength_slider: float,
-    num_inference_steps_slider: int,
-    progress=gr.Progress(track_tqdm=True)
+    num_inference_steps_slider: int
 ):
     if not input_text:
         gr.Info("Please enter a text prompt.")
         return None, None
-
     image = input_image_editor['background']
     mask = input_image_editor['layers'][0]
+    print("image:", type(image), "mask:", type(mask))
 
     if not image:
         gr.Info("Please upload an image.")
@@ -78,14 +77,10 @@ def process_with_flux(
         gr.Info("Please draw a mask on the image.")
         return None, None
 
-    print("image.size:", image.size)
     width, height = resize_image_dimensions(original_resolution_wh=image.size)
-    # resized_image = image.resize((width, height), Image.LANCZOS)
-    # resized_mask = mask.resize((width, height), Image.LANCZOS)
-    print("width, height:", width, height)
     if randomize_seed_checkbox:
         seed_slicer = random.randint(0, MAX_SEED)
-    # print("Seed:", seed_slicer)
+    
     generator = torch.Generator().manual_seed(seed_slicer)
     result = pipe(
         prompt=input_text,
@@ -97,9 +92,7 @@ def process_with_flux(
         generator=generator,
         num_inference_steps=num_inference_steps_slider
     ).images[0]
-    print('INFERENCE DONE')
-    print("result.size:", result.size)
-    return result, mask
+    return result
     # return None, None
 
 

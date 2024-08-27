@@ -61,8 +61,13 @@ def annotate_image(image, detections):
     obj_image.paste(output_image, (0, 0), Image.fromarray(mask_image))  # 使用遮罩图作为透明度
 
     inverted_mask = 255 - mask_image
-
-    return obj_image, Image.fromarray(inverted_mask)
+    input_image_editor = {
+        "background": output_image,
+        "layers": [Image.fromarray(inverted_mask)]
+    }
+    flux_image = process_with_flux(input_image_editor, "the e-commerce poster", 42, True, 0.85, 20)
+    print("flux_image:", type(flux_image))
+    return flux_image, Image.fromarray(inverted_mask)
 
 
 
@@ -288,4 +293,4 @@ with gr.Blocks() as demo:
     #     outputs=video_processing_video_output_component
     # )
 
-demo.launch(server_name="0.0.0.0", server_port=7861)
+demo.launch(debug=False, show_error=True)
