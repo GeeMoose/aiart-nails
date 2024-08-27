@@ -65,10 +65,8 @@ def annotate_image(image, detections):
         "background": output_image,
         "layers": [Image.fromarray(inverted_mask)]
     }
-    flux_image = process_with_flux(input_image_editor, "Create an e-commerce poster background image for selling nails. The background should be sleek and modern, utilizing a color palette of soft pinks, whites, and metallic golds. Incorporate elements such as beautifully manicured hands, nail polish bottles, and elegant nail art designs. The layout should be clean and organized, leaving space for product descriptions and promotional text. The overall aesthetic should be glamorous and sophisticated, appealing to a stylish and fashion-conscious audience. Add subtle accents like sparkles, delicate floral motifs, or geometric patterns to enhance the luxurious feel of the poster.", 42, True, 0.85, 20)
+    flux_image = process_with_flux(input_image_editor, "e-commerce poster background", 42, True, 0.85, 50)
     return flux_image, Image.fromarray(inverted_mask)
-
-
 
 @torch.inference_mode()
 @torch.autocast(device_type="cuda", dtype=torch.bfloat16)
@@ -79,7 +77,6 @@ def process_image(
         gr.Info("Please upload an image.")
         return None, None
 
-    
     # if not text_input:
     #     gr.Info("Please enter a text prompt.")
     #     return None, None

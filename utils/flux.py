@@ -98,16 +98,18 @@ def process_with_flux(
     if randomize_seed_checkbox:
         seed_slicer = random.randint(0, MAX_SEED)
     
-    generator = torch.Generator().manual_seed(seed_slicer)
+    generator = torch.Generator("cpu").manual_seed(seed_slicer)
     result = pipe(
         prompt=input_text,
         image=image,
         mask_image=mask,
-        width=width,
         height=height,
+        width=width,
+        guidance_scale=3.5,
+        num_inference_steps=num_inference_steps_slider,
+        max_sequence_length=512,
         strength=strength_slider,
-        generator=generator,
-        num_inference_steps=num_inference_steps_slider
+        generator=generator
     ).images[0]
     return result
     # return None, None
