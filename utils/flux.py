@@ -35,10 +35,10 @@ def resize_image_dimensions(
 ) -> Tuple[int, int]:
     width, height = original_resolution_wh
 
-    # if width <= maximum_dimension and height <= maximum_dimension:
-    #     width = width - (width % 32)
-    #     height = height - (height % 32)
-    #     return width, height
+    if width <= maximum_dimension and height <= maximum_dimension:
+        width = width - (width % 32)
+        height = height - (height % 32)
+        return width, height
 
     if width > height:
         scaling_factor = maximum_dimension / width
@@ -54,7 +54,7 @@ def resize_image_dimensions(
     return new_width, new_height
 
 
-def process(
+def process_with_flux(
     input_image_editor: dict,
     input_text: str,
     seed_slicer: int,
@@ -78,18 +78,19 @@ def process(
         gr.Info("Please draw a mask on the image.")
         return None, None
 
+    print("image.size:", image.size)
     width, height = resize_image_dimensions(original_resolution_wh=image.size)
-    resized_image = image.resize((width, height), Image.LANCZOS)
-    resized_mask = mask.resize((width, height), Image.LANCZOS)
-
+    # resized_image = image.resize((width, height), Image.LANCZOS)
+    # resized_mask = mask.resize((width, height), Image.LANCZOS)
+    print("width, height:", width, height)
     if randomize_seed_checkbox:
         seed_slicer = random.randint(0, MAX_SEED)
     # print("Seed:", seed_slicer)
     generator = torch.Generator().manual_seed(seed_slicer)
     result = pipe(
         prompt=input_text,
-        image=resized_image,
-        mask_image=resized_mask,
+        image=image,
+        mask_image=mask,
         width=width,
         height=height,
         strength=strength_slider,
@@ -97,7 +98,8 @@ def process(
         num_inference_steps=num_inference_steps_slider
     ).images[0]
     print('INFERENCE DONE')
-    return result, resized_mask
+    print("result.size:", result.size)
+    return result, mask
     # return None, None
 
 
@@ -164,7 +166,7 @@ with gr.Blocks() as demo:
                     type='pil', image_mode='RGB', label='Input mask', format="png")
 
     submit_button_component.click(
-        fn=process,
+        fn=process_with_flux,
         inputs=[
             input_image_editor_component,
             input_text_component,

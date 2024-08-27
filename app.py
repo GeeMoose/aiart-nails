@@ -12,6 +12,7 @@ from tqdm import tqdm
 from utils.florence import load_florence_model, run_florence_inference, \
     FLORENCE_DETAILED_CAPTION_TASK, \
     FLORENCE_CAPTION_TO_PHRASE_GROUNDING_TASK, FLORENCE_OPEN_VOCABULARY_DETECTION_TASK
+from utils.flux import process_with_flux
 from utils.sam import load_sam_image_model, run_sam_inference
 
 # VIDEO_SCALE_FACTOR = 0.5
