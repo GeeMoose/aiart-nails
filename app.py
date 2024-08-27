@@ -52,6 +52,7 @@ def annotate_image(image, detections):
     mask_image = np.zeros((image.height, image.width), dtype=np.uint8)
     for mask in detections.mask:
         mask_image[mask] = 255
+    
     # mask_image = MASK_ANNOTATOR_0.annotate(output_image, detections)
     # output_image = MASK_ANNOTATOR.annotate(output_image, detections)
 
@@ -59,7 +60,9 @@ def annotate_image(image, detections):
     obj_image = Image.new("RGBA", output_image.size)
     obj_image.paste(output_image, (0, 0), Image.fromarray(mask_image))  # 使用遮罩图作为透明度
 
-    return obj_image, Image.fromarray(mask_image)
+    inverted_mask = 255 - mask_image
+
+    return obj_image, Image.fromarray(inverted_mask)
 
 
 
@@ -285,4 +288,4 @@ with gr.Blocks() as demo:
     #     outputs=video_processing_video_output_component
     # )
 
-demo.launch(debug=False, show_error=True)
+demo.launch(server_name="0.0.0.0", server_port=7861)
