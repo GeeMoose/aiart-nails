@@ -289,4 +289,6 @@ with gr.Blocks() as demo:
     #     outputs=video_processing_video_output_component
     # )
 
-demo.launch(debug=False, show_error=True)
+demo.launch(debug=False,
+    server_name="0.0.0.0",
+    server_port=7778,)
