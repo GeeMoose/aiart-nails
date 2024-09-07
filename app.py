@@ -47,7 +47,7 @@ MASK_ANNOTATOR = sv.MaskAnnotator(
 )
 
 
-def annotate_image(image, detections):
+def annotate_image(image, prompt, detections):
     output_image = image.copy()
     mask_image = np.zeros((image.height, image.width), dtype=np.uint8)
     for mask in detections.mask:
@@ -65,13 +65,13 @@ def annotate_image(image, detections):
         "background": output_image,
         "layers": [Image.fromarray(inverted_mask)]
     }
-    flux_image = process_with_flux(input_image_editor, "e-commerce poster background", 42, True, 0.85, 50)
+    flux_image = process_with_flux(input_image_editor, prompt, 42, True, 0.85, 50)
     return flux_image, Image.fromarray(inverted_mask)
 
 @torch.inference_mode()
 @torch.autocast(device_type="cuda", dtype=torch.bfloat16)
 def process_image(
-    image_input, text_input = "The Nails"
+    image_input, text_prompt = "e-commerce poster background", text_input = "The Nails"
 ) -> Tuple[Optional[Image.Image], Optional[str]]:
     if not image_input:
         gr.Info("Please upload an image.")
@@ -103,7 +103,7 @@ def process_image(
 
     detections = sv.Detections.merge(detections_list)
     detections = run_sam_inference(SAM_IMAGE_MODEL, image_input, detections)
-    return annotate_image(image_input, detections)
+    return annotate_image(image_input, text_prompt, detections)
 
 # @torch.inference_mode()
 # @torch.autocast(device_type="cuda", dtype=torch.bfloat16)
@@ -218,6 +218,9 @@ with gr.Blocks() as demo:
             with gr.Column():
                 image_processing_image_input_component = gr.Image(
                     type='pil', label='Upload image')
+                text_prompt_component = gr.Textbox(
+                    label="Text prompt", placeholder="Enter comma separated text prompts"
+                )
                 image_processing_submit_button_component = gr.Button(
                     value='Submit', variant='primary')
             with gr.Column():
@@ -263,7 +266,8 @@ with gr.Blocks() as demo:
     image_processing_submit_button_component.click(
         fn=process_image,
         inputs=[
-            image_processing_image_input_component
+            image_processing_image_input_component,
+            text_prompt_component
         ],
         outputs=[
             image_processing_image_output_component,
